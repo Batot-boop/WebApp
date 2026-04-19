@@ -10,12 +10,6 @@ class MovieService
         $curl = curl_init();
         curl_setopt_array($curl, 
         [
-            // CURLOPT_URL => "https://imdb236.p.rapidapi.com/api/imdb/cast/nm0000190/titles",
-            // CURLOPT_ENCODING => "",
-            // CURLOPT_MAXREDIRS => 10,
-            // CURLOPT_TIMEOUT => 30,
-            // CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            // CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => 
@@ -28,7 +22,6 @@ class MovieService
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
-        curl_close($curl);
 
         // error_log("cURL Error :" . $err); 
         return ($err) ? null : json_decode($response, true);
@@ -66,8 +59,6 @@ class MovieService
                 'image'           => $details['primaryImage'] ?? null,
                 'trailer'         => $details['trailer'] ?? 'No Trailer Available',
                 'releaseDate'     => $details['releaseDate'] ?? 'Unknown',
-                'spokenLanguages' => $details['spokenLanguages'] ?? 'Unknown',
-                'locations'       => $details['filmingLocations'] ?? 'Unknown',
                 'genres'          => $details['genres'] ?? [],
             ];
         }
@@ -92,10 +83,12 @@ class MovieService
 
     public function getMovieDetails($id) 
     {
-        $url = "https://imdb236.p.rapidapi.com/api/imdb/title/" . $id;
+        $url = "https://imdb236.p.rapidapi.com/api/imdb/" . $id;
         
         $response = $this->connectAPI($url);
-        return $this->cleanDetails($response);
+        if($response && !isset($response['message']))
+            return $this->cleanDetails($response); 
+        return ['error' => 'Movie not found or API error!'];
     }
 }
 
@@ -122,11 +115,12 @@ switch($action)
         echo json_encode($service->getAnyData($filter));
         break;
     case 'details':
-        if(!isset($filter['id'])) {
-            echo json_encode(['error' => 'Movie ID is required for details!']);
+        $movieID = $filter['id'] ?? null;
+        if(!isset($movieID)) {
+            echo json_encode(['error' => 'Movie ID is missing!']);
             exit;
         }
-        echo json_encode($service->getMovieDetails($filter['id']));
+        echo json_encode($service->getMovieDetails($movieID));
         break;
     default:
         echo json_encode(['error' => 'Invalid action specified!']);

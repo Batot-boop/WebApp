@@ -1,4 +1,4 @@
-function fetchModified($action, params = {}, tag = "")
+function fetchModified(action, params = {}, tag = "")
 {
     fetch(`API_Ops.php?action=${action}&${new URLSearchParams(params).toString()}`)
     .then(respone => 
@@ -28,7 +28,6 @@ function fetchModified($action, params = {}, tag = "")
                     <h2>${data.title}</h2>
                     <img src="${data.image}" style="width:200px">
                     <p><strong>Release:</strong> ${data.releaseDate}</p>
-                    <p><strong>Languages:</strong> ${data.spokenLanguages}</p>
                     <p><strong>Genres:</strong> ${data.genres.join(', ')}</p>
                     <a href="${data.trailer}" target="_blank">Watch Trailer</a>
                     <button onclick="document.getElementById('${tag}').innerHTML=''">Close</button>
@@ -57,5 +56,5 @@ function getMoviesAPI(filters = {})
 
 function getMovieDetails(id)
 {
-    fetchModified("details", {id: id}, "movieDetails");
+    fetchModified("details", {id : id}, "movieDetails");
 }
