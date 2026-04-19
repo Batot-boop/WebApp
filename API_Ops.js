@@ -28,8 +28,11 @@ function fetchModified(action, params = {}, tag = "")
                     <h2>${data.title}</h2>
                     <img src="${data.image}" style="width:200px">
                     <p><strong>Release:</strong> ${data.releaseDate}</p>
+                    <p><strong>Spoken Languages:</strong> ${data.spokenLanguages}</p>
+                    <p><strong>Locations:</strong> ${data.locations}</p>
                     <p><strong>Genres:</strong> ${data.genres.join(', ')}</p>
                     <a href="${data.trailer}" target="_blank">Watch Trailer</a>
+                    <p><strong>Description:</strong> ${data.description}</p>
                     <button onclick="document.getElementById('${tag}').innerHTML=''">Close</button>
                 </div>`;
         }

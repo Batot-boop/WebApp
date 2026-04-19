@@ -2,7 +2,7 @@
 // API Logic Operations for Movie Data
 class MovieService
 {
-    private $apiKey = "f044e9ca29msh57825161a92c247p1c2a1cjsn3cc4c2bf361c";
+    private $apiKey = "401c37c95fmsh2b84bfb51ee27a6p1c11bajsna23f2aba724c";
     
     // Fetching Data from API
     private function connectAPI($url) 
@@ -57,9 +57,12 @@ class MovieService
                 'id'              => $details['id'] ?? 'N/A',
                 'title'           => $details['originalTitle'] ?? 'No Title',
                 'image'           => $details['primaryImage'] ?? null,
-                'trailer'         => $details['trailer'] ?? 'No Trailer Available',
-                'releaseDate'     => $details['releaseDate'] ?? 'Unknown',
                 'genres'          => $details['genres'] ?? [],
+                'releaseDate'     => $details['releaseDate'] ?? 'Unknown',
+                'spokenLanguages' => $details['spokenLanguages'] ?? 'Unknown',
+                'locations'       => $details['filmingLocations'] ?? 'Unknown',
+                'trailer'         => $details['trailer'] ?? 'No Trailer Available',
+                'description'     => $details['description'] ?? 'No Description Available',
             ];
         }
         return null;
