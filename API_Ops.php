@@ -23,14 +23,12 @@ class MovieService
         $response = curl_exec($curl);
         $err = curl_error($curl);
 
-        // error_log("cURL Error :" . $err); 
         return ($err) ? null : json_decode($response, true);
     }
 
     // Data Filtering 
     private function cleanData($Movies) 
     {
-        // $Movies = $this->connectAPI();
         $cleanedData = [];
         
         if(is_array($Movies)) 
