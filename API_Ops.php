@@ -35,18 +35,19 @@ class MovieService
         {
             foreach($Movies as $movie) 
             {
-                $cleanedData[] = 
-                [
-                    'id'          => $movie['id'] ?? 'N/A',
-                    'title'       => $movie['originalTitle'] ?? 'No Title',
-                    'image'       => $movie['primaryImage'] ?? null,
-                ];
+                if(isset($movie['id'],$movie['originalTitle'],$movie['primaryImage'])) 
+                    $cleanedData = 
+                    [
+                        'id'          => $movie['id'] ?? 'N/A',
+                        'title'       => $movie['originalTitle'] ?? 'No Title',
+                        'image'       => $movie['primaryImage'] ?? null,
+                    ];
             }
         }
         return $cleanedData;
     }
 
-    public function cleanDetails($details) 
+    private function cleanDetails($details) 
     {
         if(is_array($details))
         {
@@ -66,7 +67,7 @@ class MovieService
         return null;
     }
 
-    public function getAnyData($query = []) 
+    public function getMovies($query = []) 
     {
         $params = 
         [
@@ -91,6 +92,14 @@ class MovieService
             return $this->cleanDetails($response); 
         return ['error' => 'Movie not found or API error!'];
     }
+
+    public function getPopularMovies() 
+    {
+        $url = "https://imdb236.p.rapidapi.com/api/imdb/most-popular-movies";
+        
+        $response = $this->connectAPI($url);
+        return $this->cleanData($response['results'] ?? []);
+    }
 }
 
 // Handle Js(Ajax) Request
@@ -112,8 +121,11 @@ header('Content-Type: application/json');
 // Simple Routing based on Action
 switch($action)
 {
+    case 'popular':
+        echo json_encode($service->getPopularMovies());
+        break;
     case 'search':
-        echo json_encode($service->getAnyData($filter));
+        echo json_encode($service->getMovies($filter));
         break;
     case 'details':
         $movieID = $filter['id'] ?? null;
