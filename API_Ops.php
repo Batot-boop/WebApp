@@ -2,7 +2,7 @@
 // API Logic Operations for Movie Data
 class MovieService
 {
-    private $apiKey = "401c37c95fmsh2b84bfb51ee27a6p1c11bajsna23f2aba724c";
+    private $apiKey = "d257f61be6msh2279573ec7575c9p1ac9a9jsn65cbdef3297c";
     
     // Fetching Data from API
     private function connectAPI($url) 
@@ -35,12 +35,12 @@ class MovieService
         {
             foreach($Movies as $movie) 
             {
-                if(isset($movie['id'],$movie['originalTitle'],$movie['primaryImage'])) 
-                    $cleanedData = 
+                if(!empty($movie['id']) && !empty($movie['originalTitle']) && !empty($movie['primaryImage']) && filter_var($movie['primaryImage'], FILTER_VALIDATE_URL)) 
+                    $cleanedData[] = 
                     [
-                        'id'          => $movie['id'] ?? 'N/A',
-                        'title'       => $movie['originalTitle'] ?? 'No Title',
-                        'image'       => $movie['primaryImage'] ?? null,
+                        'id'          => $movie['id'],
+                        'title'       => $movie['originalTitle'],
+                        'image'       => $movie['primaryImage']
                     ];
             }
         }
@@ -53,15 +53,15 @@ class MovieService
         {
             return 
             [
-                'id'              => $details['id'] ?? 'N/A',
-                'title'           => $details['originalTitle'] ?? 'No Title',
-                'image'           => $details['primaryImage'] ?? null,
-                'genres'          => $details['genres'] ?? [],
-                'releaseDate'     => $details['releaseDate'] ?? 'Unknown',
-                'spokenLanguages' => $details['spokenLanguages'] ?? 'Unknown',
-                'locations'       => $details['filmingLocations'] ?? 'Unknown',
-                'trailer'         => $details['trailer'] ?? 'No Trailer Available',
-                'description'     => $details['description'] ?? 'No Description Available',
+                'id'              => $details['id'],
+                'title'           => $details['originalTitle'],
+                'image'           => $details['primaryImage'],
+                'genres'          => $details['genres'],
+                'releaseDate'     => $details['releaseDate'],
+                'spokenLanguages' => $details['spokenLanguages'],
+                'locations'       => $details['filmingLocations'],
+                'trailer'         => $details['trailer'],
+                'description'     => $details['description']
             ];
         }
         return null;
@@ -98,7 +98,7 @@ class MovieService
         $url = "https://imdb236.p.rapidapi.com/api/imdb/most-popular-movies";
         
         $response = $this->connectAPI($url);
-        return $this->cleanData($response['results'] ?? []);
+        return $this->cleanData($response ?? []);
     }
 }
 

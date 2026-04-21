@@ -13,30 +13,36 @@ function fetchModified(action, params = {}, tag = "")
         if (Array.isArray(data)) 
         {
             data.forEach(movie => {
+                const cardId = `card-${movie.id}`;
                 htmlContent += `
-                    <div class="movie-card">
-                        <img src="${movie.image}" alt="${movie.title}">
-                        <h3>${movie.title}</h3>
+                    <div class="movie-card" id="${cardId}">
+                        <img src="${movie.image}" 
+                        alt="${movie.title}" 
+                        onerror="handleBrokenImage('${cardId}')"><h3>${movie.title}</h3>
                         <button onclick="getMovieDetails('${movie.id}')">View Full Details</button>
                     </div>`;
             });
         } 
-        else 
+        else if (data && !data.error) 
         {
+            if(!data.trailer) data.trailer = "No trailer available"; // Ensure trailer is defined to avoid undefined errors
             htmlContent = `
                 <div class="movie-details-full">
                     <h2>${data.title}</h2>
-                    <img src="${data.image}" style="width:200px">
-                    <p><strong>Release:</strong> ${data.releaseDate}</p>
-                    <p><strong>Spoken Languages:</strong> ${data.spokenLanguages}</p>
-                    <p><strong>Locations:</strong> ${data.locations}</p>
-                    <p><strong>Genres:</strong> ${data.genres.join(', ')}</p>
-                    <a href="${data.trailer}" target="_blank">Watch Trailer</a>
-                    <p><strong>Description:</strong> ${data.description}</p>
-                    <button onclick="document.getElementById('${tag}').innerHTML=''">Close</button>
+                    <img src="${data.image}" style="width:150px">
+                    <div style="margin-left: 170px;">
+                        ${data.releaseDate ? `<p><strong>Release:</strong> ${data.releaseDate}</p>` : ''}
+                        ${data.genres && data.genres.length > 0 ? `<p><strong>Genres:</strong> ${data.genres.join(', ')}</p>` : ''}
+                        ${data.description ? `<p><strong>Description:</strong> ${data.description}</p>` : ''}
+                        ${(data.trailer && data.trailer.startsWith('http')) 
+    ? `<a href="${data.trailer}" target="_blank">▶ Watch Trailer</a>` 
+    : `<span style="color: gray;">No Trailer Available</span>`}
+                    </div>
+                    <button onclick="document.getElementById('${tag}').innerHTML=''" style="clear:both; margin-top:20px;">Close</button>
                 </div>`;
-        }
-        
+        } 
+        else htmlContent = `<p style="color:red;">${data.error || "Data not found"}</p>`;
+
         document.getElementById(tag).innerHTML = htmlContent;
     })
     .catch(error => 
@@ -44,6 +50,16 @@ function fetchModified(action, params = {}, tag = "")
         console.error("Error:", error);
         document.getElementById(tag).innerHTML = "<p>Error fetching data!</p>";
     });
+}
+
+function handleBrokenImage(cardId)
+{
+    const cardElement = document.getElementById(cardId);
+    if (cardElement) 
+    {
+        cardElement.remove();
+        console.warn(`Removed film card ${cardId} due to broken image URL.`);
+    }
 }
 
 function getMoviesAPI(filters = {}) 
@@ -54,6 +70,8 @@ function getMoviesAPI(filters = {})
         alert("Please enter at least one search criteria!");
         return;
     }
+    // Clear popular movies when searching
+    document.getElementById("popularMovies").innerHTML = ""; 
     fetchModified("search", filters, "searchResults");
 }
 
@@ -61,3 +79,10 @@ function getMovieDetails(id)
 {
     fetchModified("details", {id : id}, "movieDetails");
 }
+
+function getPopularMovies()
+{
+    fetchModified("popular", "", "popularMovies");
+}
+
+document.addEventListener('DOMContentLoaded', getPopularMovies());
