@@ -86,3 +86,82 @@ function getPopularMovies()
 }
 
 document.addEventListener('DOMContentLoaded', getPopularMovies());
+
+//for ADD
+function addMovieFromAPI(title, image) {
+    fetch("DB_Ops.php", {
+        method: "POST",
+        body: new URLSearchParams({
+            action: "add",
+            title,
+            rating: 0,
+            image
+        })
+    })
+        .then(res => res.json())
+        .then(() => {
+            alert("Saved!");
+            getMoviesFromDB();
+        });
+}
+
+// for READ
+function getMoviesFromDB() {
+    fetch("DB_Ops.php", {
+        method: "POST",
+        body: new URLSearchParams({ action: "read" })
+    })
+        .then(res => res.json())
+        .then(data => {
+            let html = "";
+
+            data.forEach(movie => {
+                html += `
+                <div class="movie-card">
+                    <img src="${movie.image}" width="120">
+                    <h3>${movie.title}</h3>
+                    <p> ${movie.rating}</p>
+
+                    <button onclick="deleteMovie(${movie.id})">Delete</button>
+                    <button onclick="editMovie(${movie.id}, '${movie.title}', ${movie.rating})">Edit</button>
+                </div>`;
+            });
+
+            document.getElementById("moviesDB").innerHTML = html;
+        });
+}
+
+// for DELETE
+function deleteMovie(id) {
+    fetch("DB_Ops.php", {
+        method: "POST",
+        body: new URLSearchParams({ action: "delete", id })
+    })
+        .then(() => getMoviesFromDB());
+}
+
+// for UPDATE
+function updateMovie(id, title, rating) {
+    fetch("DB_Ops.php", {
+        method: "POST",
+        body: new URLSearchParams({
+            action: "update",
+            id,
+            title,
+            rating
+        })
+    })
+        .then(() => getMoviesFromDB());
+}
+
+// EDIT
+function editMovie(id, title, rating) {
+    let newTitle = prompt("Edit title:", title);
+    let newRating = prompt("Edit rating:", rating);
+
+    if (newTitle && newRating)
+        updateMovie(id, newTitle, newRating);
+}
+
+
+
