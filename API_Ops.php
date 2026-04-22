@@ -2,7 +2,7 @@
 // API Logic Operations for Movie Data
 class MovieService
 {
-    private $apiKey = "d257f61be6msh2279573ec7575c9p1ac9a9jsn65cbdef3297c";
+    private $apiKey = "3bdb7b34d9msha5058d4847ac3e5p147156jsn042bc7b8293c";
     
     // Fetching Data from API
     private function connectAPI($url) 
