@@ -1,66 +1,52 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add / Edit Movie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Movie Tracker – Search, explore, and track your favourite movies.">
+    <title>🎬 Movie Tracker</title>
     <link rel="stylesheet" href="StyleSheet.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <h1>Add Movie to Watchlist</h1>
+<!-- ===== SITE HEADER / NAVBAR ===== -->
+<header class="site-header">
+    <div class="header-inner">
 
-    <div class="search-box">
-        <input type="text" id="title" placeholder="Search movie...">
-        <button onclick="searchMovie()">Search</button>
+        <!-- Logo -->
+        <a href="index.php" class="logo">
+            <span class="logo-icon">🎬</span>
+            <span class="logo-text">Movie<span class="logo-accent">Tracker</span></span>
+        </a>
+
+        <!-- Navigation -->
+        <nav class="nav-links">
+            <a href="index.php" class="nav-link active">Home</a>
+            <a href="header.php" class="nav-link">Add Movie</a>
+        </nav>
+
+        <!-- Search bar -->
+        <div class="header-search">
+            <input type="text" id="header-search-input" placeholder="Search movies…" autocomplete="off">
+            <button onclick="headerSearch()" aria-label="Search">&#128269;</button>
+        </div>
+
     </div>
+</header>
+<!-- ============================= -->
 
-    <div id="searchResults" class="movies-container"></div>
-
-    <div id="addMovieForm" style="display:none;">
-        <h3>Add Movie</h3>
-        <input type="hidden" id="hidden_tmdb_id">
-        <input type="text" id="form_title" readonly>
-        
-        <select id="status">
-            <option value="want_to_watch">Want to Watch</option>
-            <option value="watching">Watching</option>
-            <option value="watched">Watched</option>
-        </select>
-        
-        <button onclick="saveMovie()">Add to My List</button>
-    </div>
-
-    <script src="API_Ops.js"></script>
-    <script>
-        // الكود البرمجي الخاص بك لم يتغير
-        function searchMovie() {
-            getMoviesAPI({ title: document.getElementById("title").value });
-        }
-
-        function prepareAdd(id, title) {
-            document.getElementById("addMovieForm").style.display = "block";
-            document.getElementById("hidden_tmdb_id").value = id;
-            document.getElementById("form_title").value = title;
-        }
-
-        function saveMovie() {
-            const movieData = {
-                action: 'add',
-                user_id: 1,
-                tmdb_id: document.getElementById("hidden_tmdb_id").value,
-                title: document.getElementById("form_title").value,
-                status: document.getElementById("status").value
-            };
-
-            fetch('DB_Ops.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(movieData)
-            })
-            .then(res => res.json())
-            .then(data => alert("Movie added successfully!"))
-            .catch(err => console.error("Error adding movie:", err));
-        }
-    </script>
-</body>
-</html> 
+<script>
+    function headerSearch() {
+        const val = document.getElementById('header-search-input').value.trim();
+        if (!val) return;
+        window.location.href = `index.php?q=${encodeURIComponent(val)}`;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const inp = document.getElementById('header-search-input');
+        if (inp) inp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') headerSearch();
+        });
+    });
+</script>

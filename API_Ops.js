@@ -12,36 +12,34 @@ function fetchModified(action, params = {}, tag = "")
 
         if (Array.isArray(data)) 
         {
-            data.forEach(movie => {
-                const cardId = `card-${movie.id}`;
-                htmlContent += `
-                    <div class="movie-card" id="${cardId}">
-                        <img src="${movie.image}" 
-                        alt="${movie.title}" 
-                        onerror="handleBrokenImage('${cardId}')"><h3>${movie.title}</h3>
-                        <button onclick="getMovieDetails('${movie.id}')">View Full Details</button>
-                    </div>`;
-            });
+            if (data.length === 0) {
+                htmlContent = `<div class="state-box"><div class="state-icon">🎬</div><p>No movies found. Try a different search.</p></div>`;
+            } else {
+                data.forEach(movie => {
+                    const cardId  = `card-${movie.id}`;
+                    const year    = movie.releaseDate ? movie.releaseDate.substring(0, 4) : '';
+                    const rating  = movie.rating ? parseFloat(movie.rating).toFixed(1) : '';
+                    const ratingHtml = rating ? `<span class="movie-card__rating">⭐ ${rating}</span>` : '';
+                    htmlContent += `
+                        <div class="movie-card" id="${cardId}">
+                            <div class="movie-card__poster">
+                                <img src="${movie.image}"
+                                     alt="${movie.title}"
+                                     onerror="handleBrokenImage('${cardId}')">
+                                ${ratingHtml}
+                                <div class="movie-card__overlay">
+                                    <button onclick="window.location.href='movie_details.php?id=${movie.id}'">View Details</button>
+                                </div>
+                            </div>
+                            <div class="movie-card__body">
+                                <p class="movie-card__title">${movie.title}</p>
+                                ${year ? `<p class="movie-card__year">${year}</p>` : ''}
+                            </div>
+                        </div>`;
+                });
+            }
         } 
-        else if (data && !data.error) 
-        {
-            if(!data.trailer) data.trailer = "No trailer available"; // Ensure trailer is defined to avoid undefined errors
-            htmlContent = `
-                <div class="movie-details-full">
-                    <h2>${data.title}</h2>
-                    <img src="${data.image}" style="width:150px">
-                    <div style="margin-left: 170px;">
-                        ${data.releaseDate ? `<p><strong>Release:</strong> ${data.releaseDate}</p>` : ''}
-                        ${data.genres && data.genres.length > 0 ? `<p><strong>Genres:</strong> ${data.genres.join(', ')}</p>` : ''}
-                        ${data.description ? `<p><strong>Description:</strong> ${data.description}</p>` : ''}
-                        ${(data.trailer && data.trailer.startsWith('http')) 
-    ? `<a href="${data.trailer}" target="_blank">▶ Watch Trailer</a>` 
-    : `<span style="color: gray;">No Trailer Available</span>`}
-                    </div>
-                    <button onclick="document.getElementById('${tag}').innerHTML=''" style="clear:both; margin-top:20px;">Close</button>
-                </div>`;
-        } 
-        else htmlContent = `<p style="color:red;">${data.error || "Data not found"}</p>`;
+        else htmlContent = `<div class="state-box error"><div class="state-icon">⚠️</div><p>${data?.error || 'Data not found'}</p></div>`;
 
         document.getElementById(tag).innerHTML = htmlContent;
     })
@@ -71,13 +69,15 @@ function getMoviesAPI(filters = {})
         return;
     }
     // Clear popular movies when searching
-    document.getElementById("popularMovies").innerHTML = ""; 
+    const popEl = document.getElementById("popularMovies");
+    if (popEl) popEl.innerHTML = "";
     fetchModified("search", filters, "searchResults");
 }
 
 function getMovieDetails(id)
 {
-    fetchModified("details", {id : id}, "movieDetails");
+    // Navigate to the dedicated details page
+    window.location.href = `movie_details.php?id=${encodeURIComponent(id)}`;
 }
 
 function getPopularMovies()
