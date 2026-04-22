@@ -28,7 +28,8 @@ function fetchModified(action, params = {}, tag = "")
                                      onerror="handleBrokenImage('${cardId}')">
                                 ${ratingHtml}
                                 <div class="movie-card__overlay">
-                                    <button onclick="window.location.href='movie_details.php?id=${movie.id}'">View Details</button>
+                                 <button onclick="addMovieFromAPI('${movie.title.replace(/'/g, "\\'")}', '${movie.image}')">Add to Watchlist</button>
+                                 <button onclick="window.location.href='movie_details.php?id=${movie.id}'">View Details</button>
                                 </div>
                             </div>
                             <div class="movie-card__body">

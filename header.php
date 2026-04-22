@@ -24,7 +24,7 @@
         <!-- Navigation -->
         <nav class="nav-links">
             <a href="index.php" class="nav-link active">Home</a>
-            <a href="header.php" class="nav-link">Add Movie</a>
+            <a href="add_movie.php" class="nav-link active">Add Movie</a>
         </nav>
 
         <!-- Search bar -->

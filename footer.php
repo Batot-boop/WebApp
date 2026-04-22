@@ -11,7 +11,7 @@
         <div class="footer-links">
             <h4>Quick Links</h4>
             <a href="index.php">Home</a>
-            <a href="header.php">Add Movie</a>
+            <a href="add_movie.php">Add Movie</a>
         </div>
 
         <div class="footer-info">
