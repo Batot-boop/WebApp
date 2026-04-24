@@ -1,116 +1,91 @@
 <?php
-// API Logic Operations for Movie Data
+// API_Ops.php
+
 class MovieService
-{
-    private $apiKey = "3bdb7b34d9msha5058d4847ac3e5p147156jsn042bc7b8293c";
+{ 
+    private $apiKey = "3e673b78"; 
     
-    // Fetching Data from API
     private function connectAPI($url) 
     {
-        $curl = curl_init();
-        curl_setopt_array($curl, 
-        [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => 
-            [
-                "Content-Type: application/json",
-                "x-rapidapi-host: imdb236.p.rapidapi.com",
-                "x-rapidapi-key: " . $this->apiKey
-            ],
-        ]);
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
 
         return ($err) ? null : json_decode($response, true);
     }
 
-    // Data Filtering 
     private function cleanData($Movies) 
     {
         $cleanedData = [];
-        
         if(is_array($Movies)) 
         {
             foreach($Movies as $movie) 
             {
-                if(!empty($movie['id']) && !empty($movie['originalTitle']) && !empty($movie['primaryImage']) && filter_var($movie['primaryImage'], FILTER_VALIDATE_URL)) 
+                
+                if(!empty($movie['imdbID']) && !empty($movie['Title'])) 
+                {
                     $cleanedData[] = 
                     [
-                        'id'          => $movie['id'],
-                        'title'       => $movie['originalTitle'],
-                        'image'       => $movie['primaryImage']
+                        'id'    => $movie['imdbID'],
+                        'title' => $movie['Title'],
+                        'image' => ($movie['Poster'] !== 'N/A') ? $movie['Poster'] : 'placeholder.png',
+                        'releaseDate' => $movie['Year'] ?? ''
                     ];
+                }
             }
         }
         return $cleanedData;
     }
 
-    private function cleanDetails($details) 
-    {
-        if(is_array($details))
-        {
-            return 
-            [
-                'id'              => $details['id'],
-                'title'           => $details['originalTitle'],
-                'image'           => $details['primaryImage'],
-                'genres'          => $details['genres'],
-                'releaseDate'     => $details['releaseDate'],
-                'spokenLanguages' => $details['spokenLanguages'],
-                'locations'       => $details['filmingLocations'],
-                'trailer'         => $details['trailer'],
-                'description'     => $details['description']
-            ];
-        }
-        return null;
-    }
-
     public function getMovies($query = []) 
     {
-        $params = 
-        [
-            'type' => 'movie',
-            'rows' => 20
-        ];
-        $params = array_merge($params, $query);
-
-        $queryString = http_build_query($params);
-        $url = "https://imdb236.p.rapidapi.com/api/imdb/search?" . $queryString;
+        //  
+        $search = $query['title'] ?? ($query['s'] ?? 'movie');
+        $url = "http://www.omdbapi.com/?apikey=" . $this->apiKey . "&s=" . urlencode($search);
         
         $response = $this->connectAPI($url);
-        return $this->cleanData($response['results'] ?? []);
+        // OMDb يعيد النتائج في مصفوفة تسمى Search
+        return $this->cleanData($response['Search'] ?? []);
     }
 
     public function getMovieDetails($id) 
     {
-        $url = "https://imdb236.p.rapidapi.com/api/imdb/" . $id;
-        
+        $url = "http://www.omdbapi.com/?apikey=" . $this->apiKey . "&i=" . $id . "&plot=full";
         $response = $this->connectAPI($url);
-        if($response && !isset($response['message']))
-            return $this->cleanDetails($response); 
-        return ['error' => 'Movie not found or API error!'];
+        
+        if($response && $response['Response'] !== "False") {
+            return [
+                'id'          => $response['imdbID'],
+                'title'       => $response['Title'],
+                'image'       => $response['Poster'],
+                'genres'      => $response['Genre'],
+                'releaseDate' => $response['Released'],
+                'description' => $response['Plot'],
+                'rating'      => $response['imdbRating']
+            ];
+        }
+        return ['error' => 'Movie not found!'];
     }
 
     public function getPopularMovies() 
     {
-        $url = "https://imdb236.p.rapidapi.com/api/imdb/most-popular-movies";
-        
-        $response = $this->connectAPI($url);
-        return $this->cleanData($response ?? []);
+        // OMDb 
+        return $this->getMovies(['title' => '2026']);
     }
 }
 
-// Handle Js(Ajax) Request
+// for processing 
 $action = $_GET['action'] ?? null;
 $filter = $_GET;
-
 unset($filter['action']);
-$filter = array_filter($filter, function($value){ return !empty($value); }); // Remove empty values
 
-if(!$action)
-{
+if(!$action) {
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'Action is required!']);
     exit;
 }
@@ -118,24 +93,10 @@ if(!$action)
 $service = new MovieService();
 header('Content-Type: application/json');
 
-// Simple Routing based on Action
-switch($action)
-{
-    case 'popular':
-        echo json_encode($service->getPopularMovies());
-        break;
-    case 'search':
-        echo json_encode($service->getMovies($filter));
-        break;
-    case 'details':
-        $movieID = $filter['id'] ?? null;
-        if(!isset($movieID)) {
-            echo json_encode(['error' => 'Movie ID is missing!']);
-            exit;
-        }
-        echo json_encode($service->getMovieDetails($movieID));
-        break;
-    default:
-        echo json_encode(['error' => 'Invalid action specified!']);
+switch($action) {
+    case 'popular': echo json_encode($service->getPopularMovies()); break;
+    case 'search':  echo json_encode($service->getMovies($filter)); break;
+    case 'details': echo json_encode($service->getMovieDetails($filter['id'] ?? '')); break;
+    default:        echo json_encode(['error' => 'Invalid action!']);
 }
 ?>
