@@ -122,6 +122,20 @@
 
   <!-- ========== JAVASCRIPT ========== -->
   <script>
+    
+    document.getElementById('searchForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const filters = {
+        primaryTitle: document.getElementById('primaryTitle').value.trim(),
+        genre: document.getElementById('genreSelect').value
+      };
+      getMoviesAPI(filters);
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch and display popular movies on initial load
+      fetchModified("popular");
+    });
     (function() {
       // ---------- LOGIN STATE ----------
       // Simulate a logged‑in user flag (persist to localStorage)
