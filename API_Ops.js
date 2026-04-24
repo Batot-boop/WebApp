@@ -30,6 +30,7 @@ function closeOverlay() {
     document.getElementById('detailsOverlay').classList.remove('active');
 }
 
+// ---------- Retrieve Movies From API ----------
 // Bind the close event (only needs to be executed once after the DOM has loaded)
 document.addEventListener('DOMContentLoaded', function() {
     const closeBtn = document.getElementById('closeOverlayBtn');
@@ -161,30 +162,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-
-
-
-
 // ---------- Database Operations ----------
-//for ADD
-function addMovieFromAPI(title, image) {
-    fetch("DB_Ops.php", {
-        method: "POST",
-        body: new URLSearchParams({
-            action: "add",
-            title,
-            rating: 0,
-            image
-        })
-    })
-        .then(res => res.json())
-        .then(() => {
+function addMovieFromAPI(tag = "", id) {
+    fetch(`API_Ops.php?action=retrieveToDB&id=${encodeURIComponent(id)}`)
+    .then(res => res.json())
+    .then(data => {
             alert("Saved!");
             getMoviesFromDB();
-        });
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Failed to save movie!");
+    });
 }
 
-// for READ
 function getMoviesFromDB() {
     fetch("DB_Ops.php", {
         method: "POST",
@@ -210,7 +201,6 @@ function getMoviesFromDB() {
         });
 }
 
-// for DELETE
 function deleteMovie(id) {
     fetch("DB_Ops.php", {
         method: "POST",
@@ -219,7 +209,6 @@ function deleteMovie(id) {
         .then(() => getMoviesFromDB());
 }
 
-// for UPDATE
 function updateMovie(id, title, rating) {
     fetch("DB_Ops.php", {
         method: "POST",
@@ -233,7 +222,6 @@ function updateMovie(id, title, rating) {
         .then(() => getMoviesFromDB());
 }
 
-// EDIT
 function editMovie(id, title, rating) {
     let newTitle = prompt("Edit title:", title);
     let newRating = prompt("Edit rating:", rating);

@@ -92,7 +92,7 @@
         <form id="signupForm">
           <div class="form-group">
             <label for="signupName">Full Name</label>
-            <input type="text" id="signupName" placeholder="John Doe" required>
+            <input type="text" id="signupName" placeholder="Mohamed Ahmed" required>
           </div>
           <div class="form-group">
             <label for="signupEmail">Email</label>
@@ -123,6 +123,7 @@
   <!-- ========== JAVASCRIPT ========== -->
   <script>
     
+    //<-- ========== Search ========== -->
     document.getElementById('searchForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const filters = {
@@ -131,18 +132,20 @@
       };
       getMoviesAPI(filters);
     });
-    
+
+    //<-- ========== Popular Movies ========== -->
     document.addEventListener('DOMContentLoaded', () => {
       // Fetch and display popular movies on initial load
       fetchModified("popular");
     });
+
+
     (function() {
       // ---------- LOGIN STATE ----------
-      // Simulate a logged‑in user flag (persist to localStorage)
+      // Check login state from Database
       let loggedIn = false;
       try {
-        const stored = localStorage.getItem('movieTrackerLoggedIn');
-        loggedIn = (stored === 'true');
+        // send a request to the server to check login status (DB)
       } catch(e) {}
 
       // Update UI according to login state
@@ -160,12 +163,12 @@
       // Expose login functions globally if needed
       window.login = function() {
         loggedIn = true;
-        localStorage.setItem('movieTrackerLoggedIn', 'true');
+        // Request server to set login state in DB if needed
         updateLoginUI();
       };
       window.logout = function() {
         loggedIn = false;
-        localStorage.setItem('movieTrackerLoggedIn', 'false');
+        // Request server to unset login state in DB if needed
         updateLoginUI();
         // If currently on watchlist, go to home
         if (document.getElementById('watchlist-page').classList.contains('active')) {
@@ -230,7 +233,7 @@
       // ---------- MOVIE DATABASE (shared between home DB panel & watchlist) ----------
       let movieDB = [];
       try {
-        const stored = localStorage.getItem('movieTrackerDB');
+        const stored = addMovieToDB('movieTrackerDB');
         if (stored) movieDB = JSON.parse(stored);
       } catch(e) {}
 
