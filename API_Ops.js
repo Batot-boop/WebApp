@@ -162,7 +162,4 @@ function editMovie(id, title, rating) {
 
     if (newTitle && newRating)
         updateMovie(id, newTitle, newRating);
-}
-
-
-
+}getSelection
