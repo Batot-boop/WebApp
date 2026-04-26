@@ -15,6 +15,7 @@ $loggedIn = isLoggedIn();
                 <li><a data-page="signin" class="nav-link">Sign In</a></li>
                 <li><a data-page="signup" class="nav-link">Sign Up</a></li>
             <?php endif; ?>
+            <li><a href="#" class="nav-link" data-page="upload"><i class="fas fa-upload"></i> Upload</a></li>
         </ul>
     </nav>
 </header>

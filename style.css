@@ -94,7 +94,7 @@ main {
     transform: translateX(6px);
 }
 /* Hide watchlist link by default (shown when logged in) */
-.nav-link[data-page="watchlist"] { display: none; }
+.nav-link[data-page="watchlist"],.nav-link[data-page="upload"] { display: none; }
 @media screen and (min-width: 768px) {
     .header { padding: 0.75rem 3rem; }
     .hamburger { display: none; }
@@ -112,6 +112,11 @@ main {
     .nav-list a:hover { transform: translateY(-2px); }
     .logo { margin-right: auto; }
 }
+
+body.logged-in .nav-link[data-page="upload"] {
+    display: inline-block;
+}
+
 
 /* ========== SEARCH SECTION / MOVIE GRID ========== */
 .search-section {
@@ -416,3 +421,13 @@ main {
     align-items: center;
     gap: 10px;
 }
+
+/*======== Upload container ========*/
+/* .upload-container { ... }
+.upload-form { ... }
+.upload-form h2 { ... }
+.input-group { ... }
+.input-group label { ... }
+.input-group input { ... }
+.btn-submit { ... }
+.btn-submit:hover { ... } */
